@@ -19,10 +19,37 @@
  */
 package ru.itx.fseslib;
 
+
 import junit.framework.TestCase;
+import org.junit.Test;
+
+import java.net.URL;
+import java.util.Properties;
 
 /**
  * @author Eugene Prokopiev <enp@itx.ru>
  *
  */
-public class EventManagerTest extends TestCase {}
+public class EventManagerTest {
+
+	@Test
+	public void run() {
+
+		URL url;
+		Properties params = new Properties();
+
+		try {
+			url = ClassLoader.getSystemResource("conf/fseslib.conf");
+			if (url != null) {
+				params.load(url.openStream());
+				String enable = params.getProperty("enable");
+				if (enable != null && enable.equals("yes")) {
+					System.out.println("Test passed");
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Loading configuration error");
+			e.printStackTrace();
+		}
+	}
+}
