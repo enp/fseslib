@@ -23,4 +23,6 @@ package ru.itx.fseslib;
  * @author Eugene Prokopiev <enp@itx.ru>
  *
  */
-public interface EventListener {}
+public interface EventListener {
+	public void handleEvent(Event event);
+}

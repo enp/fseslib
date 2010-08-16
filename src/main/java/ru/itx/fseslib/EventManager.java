@@ -23,4 +23,16 @@ package ru.itx.fseslib;
  * @author Eugene Prokopiev <enp@itx.ru>
  *
  */
-public class EventManager {}
+public class EventManager {
+
+	public void open(String host, String port, String password, String events) {
+	}
+
+	public void setEventListener(EventListener eventListener) {
+		if (eventListener != null)
+			eventListener.handleEvent(new Event());
+	}
+
+	public void close() {
+	}
+}

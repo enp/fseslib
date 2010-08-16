@@ -44,7 +44,21 @@ public class EventManagerTest {
 				params.load(url.openStream());
 				String enable = params.getProperty("enable");
 				if (enable != null && enable.equals("yes")) {
-					System.out.println("Test passed");
+
+					EventManager em = new EventManager();
+					em.open(
+						params.getProperty("host"),
+						params.getProperty("port"),
+						params.getProperty("password"),
+						"ALL"
+					);
+					em.setEventListener(new EventListener() {
+						public void handleEvent(Event event) {
+							System.out.println(event);
+						}
+					});
+					Thread.sleep(1000);
+					em.close();
 				}
 			}
 		} catch (Exception e) {
