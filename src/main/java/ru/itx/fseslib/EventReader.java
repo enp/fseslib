@@ -23,22 +23,22 @@ package ru.itx.fseslib;
  * @author Eugene Prokopiev <enp@itx.ru>
  *
  */
-public class EventManager {
+class EventReader implements Runnable {
 
-	private Thread eventThread;
+	private EventListener eventListener;
 
-	public void open(String host, String port, String password, String events) {
+	public EventReader(EventListener eventListener) {
+		this.eventListener = eventListener;
 	}
 
-	public void setEventListener(EventListener eventListener) {
-		if (eventListener != null) {
-			eventThread = new Thread(new EventReader(eventListener));
-			eventThread.start();
-		} else {
-			eventThread.interrupt();
+	public void run() {
+		while(!Thread.currentThread().isInterrupted()) {
+			eventListener.handleEvent(new Event());
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// interrupt
+			}
 		}
-	}
-
-	public void close() {
 	}
 }
