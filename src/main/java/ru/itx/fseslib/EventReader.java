@@ -19,6 +19,9 @@
  */
 package ru.itx.fseslib;
 
+import java.io.BufferedReader;
+import java.net.SocketException;
+
 /**
  * @author Eugene Prokopiev <enp@itx.ru>
  *
@@ -26,19 +29,33 @@ package ru.itx.fseslib;
 class EventReader implements Runnable {
 
 	private EventListener eventListener;
+	private BufferedReader eventSocketReader;
 
-	public EventReader(EventListener eventListener) {
+	public EventReader(EventListener eventListener, BufferedReader eventSocketReader) {
 		this.eventListener = eventListener;
+		this.eventSocketReader = eventSocketReader;
 	}
 
 	public void run() {
-		while(!Thread.currentThread().isInterrupted()) {
-			eventListener.handleEvent(new Event());
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				// interrupt
+		String line;
+		Event event = null;
+		try {
+			while((line = eventSocketReader.readLine()) != null) {
+				if (!line.isEmpty()) {
+					if (event == null)
+						event = new Event();
+					event.add(line);
+				} else if (event != null) {
+					if (event.getName() != null)
+						eventListener.handleEvent(event);
+					event = null;
+				}
 			}
+		} catch (SocketException e) {
+			if (!e.getMessage().equals("Socket closed"))
+				throw new Error("Event socket read error : "+e);
+		} catch (Exception e) {
+			throw new Error("Event socket read error : "+e);
 		}
 	}
 }

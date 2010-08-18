@@ -19,26 +19,38 @@
  */
 package ru.itx.fseslib;
 
+import java.io.*;
+import java.net.InetAddress;
+import java.net.Socket;
+
 /**
  * @author Eugene Prokopiev <enp@itx.ru>
  *
  */
 public class EventManager {
 
-	private Thread eventThread;
+	private Socket eventSocket;
+	private BufferedReader eventSocketReader;
+	private PrintWriter eventSocketWriter;
 
-	public void open(String host, String port, String password, String events) {
-	}
-
-	public void setEventListener(EventListener eventListener) {
-		if (eventListener != null) {
-			eventThread = new Thread(new EventReader(eventListener));
-			eventThread.start();
-		} else {
-			eventThread.interrupt();
+	public void open(String host, int port, String password, String events, EventListener eventListener) {
+		try {
+			eventSocket = new Socket(InetAddress.getByName(host), port);
+			eventSocketReader = new BufferedReader(new InputStreamReader(eventSocket.getInputStream()));
+			eventSocketWriter = new PrintWriter(eventSocket.getOutputStream(), true);
+			eventSocketWriter.println("auth " + password + "\n\n");
+			eventSocketWriter.println("event plain " + events + "\n\n");
+			new Thread(new EventReader(eventListener, eventSocketReader)).start();
+		} catch (Exception e) {
+			throw new Error("Event socket open error : "+e);
 		}
 	}
 
 	public void close() {
+		try {
+			eventSocket.close();
+		} catch (IOException e) {
+			throw new Error("Event socket close error : "+e);
+		}
 	}
 }

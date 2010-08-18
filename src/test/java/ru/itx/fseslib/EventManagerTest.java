@@ -48,16 +48,16 @@ public class EventManagerTest {
 					EventManager em = new EventManager();
 					em.open(
 						params.getProperty("host"),
-						params.getProperty("port"),
+						Integer.parseInt(params.getProperty("port")),
 						params.getProperty("password"),
-						"ALL"
-					);
-					em.setEventListener(new EventListener() {
-						public void handleEvent(Event event) {
-							System.out.println(event);
+						"ALL",
+						new EventListener() {
+							public void handleEvent(Event event) {
+								System.out.println(event.getDate() + " - " + event);
+							}
 						}
-					});
-					Thread.sleep(1000);
+					);
+					Thread.sleep(25000);
 					em.close();
 				}
 			}

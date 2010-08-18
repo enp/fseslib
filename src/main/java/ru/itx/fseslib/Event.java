@@ -19,8 +19,46 @@
  */
 package ru.itx.fseslib;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * @author Eugene Prokopiev <enp@itx.ru>
  *
  */
-public class Event {}
+public class Event {
+
+	private Map<String,String> params = new TreeMap<String,String>();
+	private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+	public void add(String line) {
+		String param[] = line.split(":");
+		try {
+			params.put(param[0].trim(), URLDecoder.decode(param[1].trim(),"UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			params.put(param[0].trim(), param[1].trim());
+		}
+	}
+
+	public String getName() {
+		return params.get("Event-Name");
+	}
+
+	public Date getDate() {
+		try {
+			return format.parse(params.get("Event-Date-Local"));
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+
+	public String toString() {
+		return "Event:"+params;
+	}
+}
